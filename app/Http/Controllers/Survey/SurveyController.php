@@ -79,18 +79,17 @@ class SurveyController extends Controller
 
     public function surveypost(Request $request)
     {
-       
+
             $user = auth()->user();
             $surM = Survey::all();
             foreach($surM as $obj){
                 if($obj->user_id == $user->id){
-                    // $submitted = true;
-                    return back()->withError('You have already Submited the survey');
+                     return response()->json(['submitted'=> 'You have already Submited the survey']);
                 }
             }
             
             foreach ($request->answer as $question => $answer) {
-
+                
                 if (is_array($answer)) {
                     $answer = implode(",", $answer);
                 }            
@@ -100,7 +99,12 @@ class SurveyController extends Controller
                 $survey->user_id = $user->id;
                 $survey->save();
             }
-            return redirect()->back()->withSuccess('Survey successfully submited');
+            if ($survey->save()) {
+                return response()->json(['success'=> 'Survey successfully Submitted']);
+            } else {
+                return response()->json(['error'=> 'error not Posted']);
+            }
+            //return redirect()->back()->withSuccess('Survey successfully submited');
     
     }
 
